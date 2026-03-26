@@ -1,0 +1,10 @@
+Code kopieren@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# Add dependencies here later if needed:
+# find_dependency(...)
+
+include("${CMAKE_CURRENT_LIST_DIR}/perf-cppTargets.cmake")
+
+check_required_components(perf-cpp)

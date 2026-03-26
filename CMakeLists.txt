@@ -166,18 +166,17 @@ set(package perf-cpp)
 
 configure_package_config_file(
         cmake/perf-cpp.cmake.in
-        ${CMAKE_CURRENT_BINARY_DIR}/perf-cpp.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/perf-cppConfig.cmake
         INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/perf-cpp
 )
 install(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/perf-cpp.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/perf-cppConfig.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/perf-cppConfigVersion.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/perf-cpp
 )
 
 write_basic_package_version_file(
-    "${package}ConfigVersion.cmake"
+        ${CMAKE_CURRENT_BINARY_DIR}/perf-cppConfigVersion.cmake
         VERSION ${PROJECT_VERSION}
-    COMPATIBILITY SameMajorVersion
-    ARCH_INDEPENDENT
+        COMPATIBILITY SameMajorVersion
 )
