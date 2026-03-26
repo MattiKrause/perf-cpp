@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 project(libperf-cpp VERSION 0.12.6 LANGUAGES CXX)
 
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -Wconversion -Wcast-align -Wunused -Wshadow -Wold-style-cast -Wpointer-arith -Wcast-qual -Wno-missing-braces")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g3")
@@ -10,18 +13,18 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 message("Building Mode                        = ${CMAKE_BUILD_TYPE}")
 
-# Include include/ folder.
-include_directories(include/)
+add_library(perf-cpp)
+target_compile_options(perf-cpp PRIVATE -Wall -Wextra -Wpedantic -Wconversion -Wcast-align -Wunused -Wshadow -Wold-style-cast -Wpointer-arith -Wcast-qual -Wno-missing-braces)
 
 #############################################################
 #   Options                                                 #
 #############################################################
 option(BUILD_EXAMPLES "Build examples in examples/ directory." OFF)
-option(BUILD_LIB_SHARED "Build the library as a shared library (default is static)." OFF)
+option(BUILD_SHARED_LIBS "Build the library as a shared library (default is static)." OFF)
 option(BUILD_TESTS "Build the unit tests." OFF)
 option(GEN_PROCESSOR_EVENTS "Generate processor-specific events" OFF)
 
-message("Building as Shared Library           = ${BUILD_LIB_SHARED}")
+message("Building as Shared Library           = ${BUILD_SHARED_LIBS}")
 message("Building Examples                    = ${BUILD_EXAMPLES}")
 message("Building Tests                       = ${BUILD_TESTS}")
 message("Generating Processor-specific Events = ${GEN_PROCESSOR_EVENTS}")
@@ -29,7 +32,7 @@ message("Generating Processor-specific Events = ${GEN_PROCESSOR_EVENTS}")
 #############################################################
 #   perf-cpp source files                                   #
 #############################################################
-set(PERF_CPP_SRC
+target_sources(perf-cpp PRIVATE
     src/config.cpp
     src/counter.cpp
     src/counter_definition.cpp
@@ -84,21 +87,27 @@ endif()
 #############################################################
 #   perf-cpp library definition                             #
 #############################################################
-if (BUILD_LIB_SHARED)
-    add_library(perf-cpp SHARED ${PERF_CPP_SRC})
-else ()
-    add_library(perf-cpp STATIC ${PERF_CPP_SRC})
-endif ()
+target_sources(perf-cpp PRIVATE ${PERF_CPP_SRC})
+add_library(perf-cpp::perf-cpp ALIAS perf-cpp)
+
+target_include_directories(perf-cpp
+        PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+target_compile_features(perf-cpp PUBLIC cxx_std_17)
 
 #############################################################
 #   clang-tidy integration                                  #
 #############################################################
+if(PROJECT_IS_TOP_LEVEL)
 find_program(CLANG_TIDY NAMES "clang-tidy")
 if(CLANG_TIDY)
     set(CLANG_TIDY_COMMAND "${CLANG_TIDY}" "--config-file=${CMAKE_SOURCE_DIR}/.clang-tidy")
     set_target_properties(perf-cpp PROPERTIES CXX_CLANG_TIDY "${CLANG_TIDY_COMMAND}")
 else()
     message(WARNING "clang-tidy not found")
+endif()
 endif()
 
 #############################################################
@@ -124,54 +133,51 @@ add_custom_target(perf-list python3 ${CMAKE_SOURCE_DIR}/script/create_perf_list.
 #############################################################
 #   Rules for installing the library                        #
 #############################################################
-if(PROJECT_IS_TOP_LEVEL)
-    include(CPack)
-    set(CMAKE_INSTALL_INCLUDEDIR include CACHE PATH "")
-    set(CMAKE_INSTALL_LIBRARY_DIR bin CACHE PATH "")
-endif()
+set_target_properties(perf-cpp PROPERTIES
+        VERSION ${PROJECT_VERSION}
+        SOVERSION ${PROJECT_VERSION_MAJOR}
+        EXPORT_NAME perf-cpp
+)
 
-include(CMakePackageConfigHelpers)
-include(GNUInstallDirs)
+install(TARGETS perf-cpp
+        EXPORT perf-cppTargets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}   # shared libs
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}   # static libs
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}   # Windows DLLs
+        INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(DIRECTORY include/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT perf-cpp
+)
+
+install(EXPORT perf-cppTargets
+        FILE perf-cppTargets.cmake
+        NAMESPACE perf-cpp::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/perf-cpp
+)
 
 # Allow package maintainers to freely override the path for the configs
 set(package perf-cpp)
 
-install(DIRECTORY include/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}" COMPONENT perf-cpp)
-install(TARGETS perf-cpp EXPORT perf-cppTargets  DESTINATION "${CMAKE_INSTALL_LIBRARY_DIR}")
+
+#install(TARGETS perf-cpp EXPORT perf-cppTargets  DESTINATION "${CMAKE_INSTALL_LIBRARY_DIR}")
+
+configure_package_config_file(
+        cmake/perf-cpp.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/perf-cpp.cmake
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/perf-cpp
+)
+install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/perf-cpp.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/perf-cppConfigVersion.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/perf-cpp
+)
 
 write_basic_package_version_file(
     "${package}ConfigVersion.cmake"
+        VERSION ${PROJECT_VERSION}
     COMPATIBILITY SameMajorVersion
     ARCH_INDEPENDENT
-)
-
-set(
-    perf-cpp_INSTALL_CMAKEDIR "${CMAKE_INSTALL_DATADIR}/${package}"
-    CACHE PATH "CMake package config location relative to the install prefix"
-)
-mark_as_advanced(perf-cpp_INSTALL_CMAKEDIR)
-
-file(
-    WRITE
-    "${PROJECT_BINARY_DIR}/${package}Config.cmake"
-    "include(\"${CMAKE_INSTALL_PREFIX}/${perf-cpp_INSTALL_CMAKEDIR}/${package}Targets.cmake\")"
-)
-
-install(
-    FILES "${PROJECT_BINARY_DIR}/${package}Config.cmake"
-    DESTINATION "${perf-cpp_INSTALL_CMAKEDIR}"
-    COMPONENT perf-cpp
-)
-
-install(
-    FILES "${PROJECT_BINARY_DIR}/${package}ConfigVersion.cmake"
-    DESTINATION "${perf-cpp_INSTALL_CMAKEDIR}"
-    COMPONENT perf-cpp
-)
-
-install(
-    EXPORT perf-cppTargets
-    NAMESPACE perf-cpp::
-    DESTINATION "${perf-cpp_INSTALL_CMAKEDIR}"
-    COMPONENT perf-cpp
 )
