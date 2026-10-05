@@ -1,5 +1,13 @@
+#include "perfcpp/metric/expression/token.h"
+#include <cctype>
+#include <cstddef>
+#include <cstdint>
+#include <optional>
 #include <perfcpp/exception.h>
 #include <perfcpp/metric/expression/tokenizer.h>
+#include <stdexcept>
+#include <string>
+#include <utility>
 
 std::optional<perf::metric::expression::Token>
 perf::metric::expression::Tokenizer::next()

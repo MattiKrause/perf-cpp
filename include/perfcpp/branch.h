@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <linux/perf_event.h>
 #include <optional>
-#include <perfcpp/feature.h>
 
 namespace perf {
 /**

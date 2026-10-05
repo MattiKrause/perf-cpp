@@ -3,9 +3,6 @@
 #include <perfcpp/counter.h>
 
 #include <cstdint>
-#if defined(__x86_64__) || defined(__i386__)
-#include <cpuid.h>
-#endif
 
 #if !(defined(__x86_64__) || defined(__i386__))
 #define __builtin_cpu_is(x) 0

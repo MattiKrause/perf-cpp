@@ -1,6 +1,13 @@
+#include "perfcpp/metric/expression/expression.h"
+#include "perfcpp/metric/expression/token.h"
 #include <algorithm>
+#include <memory>
 #include <perfcpp/metric/expression/function.h>
 #include <perfcpp/metric/expression/parser.h>
+#include <string>
+#include <utility>
+#include <variant>
+#include <vector>
 
 std::unique_ptr<perf::metric::expression::ExpressionInterface>
 perf::metric::expression::Parser::parse()

@@ -1,6 +1,13 @@
 #include <algorithm>
+#include <cstdint>
+#include <functional>
+#include <ios>
+#include <optional>
 #include <perfcpp/util/callchain_trie.h>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 perf::util::CallchainTrie::CallchainTrie()
 {

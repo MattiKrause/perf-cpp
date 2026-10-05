@@ -1,15 +1,26 @@
+#include "perfcpp/sample_recording_values.h"
+#include "perfcpp/symbol_resolver.h"
 #include <algorithm>
+#include <array>
+#include <cstddef>
+#include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <linux/perf_event.h>
 #include <numeric>
+#include <optional>
 #include <perfcpp/record_file_writer.h>
 #include <perfcpp/sample_decoder.h>
 #include <perfcpp/sampler.h>
 #include <sstream>
+#include <string_view>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/sysmacros.h>
+#include <tuple>
 #include <unistd.h>
+#include <utility>
+#include <vector>
 
 void
 perf::RecordFileWriter::write(const SampleRecordingValues& sampler_values,

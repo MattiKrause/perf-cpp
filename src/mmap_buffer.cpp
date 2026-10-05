@@ -1,10 +1,21 @@
+#include "perfcpp/util/unique_file_descriptor.h"
+#include <algorithm>
+#include <cerrno>
+#include <cstddef>
+#include <cstdint>
 #include <cstring>
+#include <functional>
+#include <linux/perf_event.h>
+#include <mutex>
+#include <optional>
 #include <perfcpp/exception.h>
 #include <perfcpp/hardware_info.h>
 #include <perfcpp/mmap_buffer.h>
 #include <sys/eventfd.h>
 #include <sys/mman.h>
 #include <sys/select.h>
+#include <utility>
+#include <vector>
 
 #if defined(__x86_64__) || defined(__i386__)
 #include <x86intrin.h>
@@ -123,7 +134,6 @@ perf::MmapBuffer::~MmapBuffer()
   }
 }
 
-#include <iostream>
 
 std::optional<std::uint64_t>
 perf::MmapBuffer::read_performance_monitoring_counter() const noexcept

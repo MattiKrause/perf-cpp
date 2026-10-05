@@ -1,11 +1,19 @@
+#include "perfcpp/exception.h"
 #include <algorithm>
+#include <cctype>
 #include <cerrno>
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <optional>
 #include <perfcpp/counter_definition.h>
 #include <perfcpp/group.h>
 #include <perfcpp/hardware_info.h>
+#include <stdexcept>
+#include <string>
 #include <unistd.h>
+#include <vector>
 #if defined(__x86_64__) || defined(__i386__)
 #include <cpuid.h>
 #endif

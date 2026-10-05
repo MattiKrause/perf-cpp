@@ -1,12 +1,23 @@
+#include "perfcpp/metric.h"
+#include "perfcpp/period.h"
+#include "perfcpp/precision.h"
+#include "perfcpp/sample.h"
+#include "perfcpp/sample_result.h"
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <iterator>
+#include <optional>
 #include <perfcpp/exception.h>
 #include <perfcpp/hardware_info.h>
-#include <perfcpp/ibs_decoder.h>
 #include <perfcpp/record_file_writer.h>
 #include <perfcpp/sample_decoder.h>
 #include <perfcpp/sampler.h>
-#include <stdexcept>
+#include <string>
+#include <string_view>
+#include <tuple>
 #include <utility>
+#include <vector>
 
 perf::Sampler::SampleCounter::~SampleCounter()
 {

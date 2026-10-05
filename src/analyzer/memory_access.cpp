@@ -1,11 +1,22 @@
+#include "perfcpp/analyzer/data_type.h"
+#include "perfcpp/hardware_info.h"
+#include "perfcpp/sample_result.h"
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
+#include <functional>
+#include <iterator>
 #include <numeric>
 #include <perfcpp/analyzer/memory_access.h>
 #include <perfcpp/exception.h>
 #include <perfcpp/util/table.h>
 #include <sstream>
-#include <stdexcept>
-#include <unordered_set>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 void
 perf::analyzer::MemoryAccess::add(perf::analyzer::DataType&& data_type)

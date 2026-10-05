@@ -1,9 +1,19 @@
+#include "perfcpp/counter.h"
+#include "perfcpp/counter_result.h"
+#include "perfcpp/group.h"
+#include "perfcpp/requested_event.h"
 #include <algorithm>
+#include <chrono>
+#include <cstdint>
+#include <iterator>
 #include <numeric>
+#include <optional>
 #include <perfcpp/event_counter.h>
 #include <perfcpp/exception.h>
-#include <stdexcept>
+#include <string>
+#include <sys/types.h>
 #include <utility>
+#include <vector>
 
 perf::EventCounter
 perf::EventCounter::copy_from_template(const perf::EventCounter& other)

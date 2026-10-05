@@ -1,7 +1,12 @@
+#include <algorithm>
+#include <cstddef>
 #include <numeric>
 #include <perfcpp/exception.h>
 #include <perfcpp/util/table.h>
 #include <sstream>
+#include <string>
+#include <utility>
+#include <vector>
 
 void
 perf::util::Table::add(std::vector<perf::util::Table::Header>&& header_row)

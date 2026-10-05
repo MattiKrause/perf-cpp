@@ -1,8 +1,15 @@
 #include "perfcpp/hardware_info.h"
+#include "perfcpp/sample.h"
+#include "perfcpp/sample_recording_values.h"
 #include <algorithm>
+#include <fstream>
+#include <functional>
+#include <ostream>
 #include <perfcpp/analyzer/flame_graph_generator.h>
 #include <perfcpp/sample_result.h>
-#include <perfcpp/util/callchain_trie.h>
+#include <string>
+#include <utility>
+#include <variant>
 
 void
 perf::SampleResult::filter(std::function<bool(const Sample&)> filter)

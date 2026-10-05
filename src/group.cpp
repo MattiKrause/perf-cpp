@@ -1,4 +1,9 @@
-#include <iostream>
+#include "perfcpp/config.h"
+#include "perfcpp/counter.h"
+#include "perfcpp/sample_recording_values.h"
+#include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <perfcpp/exception.h>
 #include <perfcpp/group.h>
 #include <type_traits>

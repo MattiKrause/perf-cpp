@@ -1,6 +1,23 @@
+#include "perfcpp/branch.h"
+#include "perfcpp/counter_result.h"
+#include "perfcpp/group.h"
+#include "perfcpp/metadata.h"
+#include "perfcpp/registers.h"
+#include "perfcpp/requested_event.h"
+#include "perfcpp/sample.h"
+#include <cstddef>
+#include <cstdint>
+#include <linux/perf_event.h>
+#include <optional>
 #include <perfcpp/hardware_info.h>
 #include <perfcpp/ibs_decoder.h>
 #include <perfcpp/sample_decoder.h>
+#include <string_view>
+#include <tuple>
+#include <unordered_map>
+#include <utility>
+#include <variant>
+#include <vector>
 
 std::optional<perf::Metadata::Mode>
 perf::SampleIterator::mode() const noexcept

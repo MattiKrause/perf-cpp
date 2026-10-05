@@ -1,8 +1,23 @@
-#include <fstream>
+#include "perfcpp/counter.h"
+#include "perfcpp/event_provider.h"
+#include "perfcpp/metric.h"
+#include "perfcpp/time_event.h"
+#include <algorithm>
+#include <functional>
+#include <ios>
+#include <iterator>
+#include <memory>
+#include <optional>
 #include <perfcpp/counter_definition.h>
 #include <perfcpp/hardware_info.h>
 #include <perfcpp/util/table.h>
 #include <sstream>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 /// The global CounterDefinition instance is used as a default one for EventCounter and Sampler. This instance detects
 /// counters from the perf subsystem and (if activated) processor-specific events. Further (child) counter definitions

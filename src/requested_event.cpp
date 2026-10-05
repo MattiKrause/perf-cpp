@@ -1,4 +1,13 @@
+#include "perfcpp/counter_definition.h"
+#include "perfcpp/counter_result.h"
+#include "perfcpp/util/graph.h"
+#include <algorithm>
+#include <cstdint>
+#include <optional>
 #include <perfcpp/requested_event.h>
+#include <string_view>
+#include <utility>
+#include <vector>
 
 bool
 perf::RequestedEventSet::add(const RequestedEvent& event)

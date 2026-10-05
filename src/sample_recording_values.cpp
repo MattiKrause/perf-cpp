@@ -1,3 +1,5 @@
+#include <cstdint>
+#include <linux/perf_event.h>
 #include <perfcpp/sample_recording_values.h>
 
 std::uint64_t

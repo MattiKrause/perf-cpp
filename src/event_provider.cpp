@@ -1,16 +1,23 @@
 #include <algorithm>
 #include <cctype>
+#include <cstdint>
+#include <filesystem>
 #include <fstream>
 #include <linux/perf_event.h>
+#include <memory>
+#include <optional>
 #include <perfcpp/counter_definition.h>
 #include <perfcpp/event_provider.h>
 #include <perfcpp/exception.h>
-#include <perfcpp/feature.h>
 #include <perfcpp/hardware_info.h>
 #include <perfcpp/metric.h>
 #include <perfcpp/time_event.h>
 #include <regex>
 #include <sstream>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <vector>
 
 void
 perf::PerfSubsystemEventProvider::add_events(perf::CounterDefinition& counter_definition)

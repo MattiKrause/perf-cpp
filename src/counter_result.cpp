@@ -1,7 +1,13 @@
 #include <algorithm>
-#include <iomanip>
+#include <cstddef>
+#include <optional>
+#include <ostream>
 #include <perfcpp/counter_result.h>
 #include <sstream>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <vector>
 
 std::optional<double>
 perf::CounterResult::get(std::string_view name) const noexcept

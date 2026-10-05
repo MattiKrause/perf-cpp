@@ -1,11 +1,8 @@
 #pragma once
 
 #include "config.h"
-#include "counter.h"
 #include "counter_definition.h"
-#include "group.h"
-#include "requested_event.h"
-#include <chrono>
+#include "counter_result.h"
 #include <optional>
 #include <string>
 #include <string_view>
@@ -68,7 +65,7 @@ public:
    * @param schedule Request to schedule events anywhere (append), or to a single hardware counter (individual).
    * @return True, if the event could be added.
    */
-  bool add(std::string&& event_name, const Schedule schedule = Schedule::Append) { return add(event_name, schedule); }
+  virtual bool add(std::string&& event_name, const Schedule schedule = Schedule::Append) { return add(event_name, schedule); }
 
   /**
    * Add the specified event to the list of monitored countered events.
@@ -78,7 +75,7 @@ public:
    * @param schedule Request to schedule events anywhere (append), or to a single hardware counter (individual).
    * @return True, if the event could be added.
    */
-  bool add(const std::string& event_name, Schedule schedule = Schedule::Append);
+  virtual bool add(const std::string& event_name, Schedule schedule = Schedule::Append) = 0;
 
   /**
    * Add the specified events to the list of countered events.
@@ -89,7 +86,7 @@ public:
    * group (all to the same hardware counter).
    * @return True, if the events could be added.
    */
-  bool add(std::vector<std::string>&& event_names, const Schedule schedule = Schedule::Append)
+  virtual bool add(std::vector<std::string>&& event_names, const Schedule schedule = Schedule::Append)
   {
     return add(event_names, schedule);
   }
@@ -103,7 +100,7 @@ public:
    * group (all to the same hardware counter).
    * @return True, if the events could be added.
    */
-  bool add(const std::vector<std::string>& event_names, Schedule schedule = Schedule::Append);
+  virtual bool add(const std::vector<std::string>& event_names, Schedule schedule = Schedule::Append) = 0;
 
   /**
    * Add the specified event to the list of countered performance events.
@@ -112,7 +109,7 @@ public:
    *
    * @param event_name Name of the event.
    */
-  void add_live(std::string&& event_name) { add_live(event_name); }
+  virtual void add_live(std::string&& event_name) { add_live(event_name); }
 
   /**
    * Add the specified event to the list of countered performance events.
@@ -121,7 +118,7 @@ public:
    *
    * @param event_name Name of the event.
    */
-  void add_live(const std::string& event_name);
+   virtual void add_live(const std::string& event_name) = 0;
 
   /**
    * Add the specified events to the list of countered performance events.
@@ -130,29 +127,29 @@ public:
    *
    * @param event_names List of event names.
    */
-  void add_live(std::vector<std::string>&& event_names);
+  virtual void add_live(std::vector<std::string>&& event_names) = 0;
 
   /**
    * Opens hardware performance counters.
    */
-  void open();
+  virtual void open() = 0;
 
   /**
    * Opens (if not already done) and starts recording performance counters.
    *
    * @return True, of the performance counters could be started.
    */
-  bool start();
+  virtual bool start() = 0;
 
   /**
    * Stops recording performance counters.
    */
-  void stop();
+  virtual void stop() = 0;
 
   /**
    * Closes the hardware performance counters.
    */
-  void close();
+  virtual void close() = 0;
 
   /**
    * Returns the result of the performance measurement.
@@ -160,7 +157,7 @@ public:
    * @param normalization Normalization value, default = 1.
    * @return List of event names and values.
    */
-  [[nodiscard]] CounterResult result(std::uint64_t normalization = 1U) const;
+  [[nodiscard]] virtual CounterResult result(std::uint64_t normalization = 1U) const = 0;
 
   /**
    * Performs a live read for every group without stopping the counter and writes it into the result input/output.
@@ -168,7 +165,7 @@ public:
    *
    * @param result Output parameter to write the result without allocating any memory.
    */
-  void live_result(std::vector<double>& result) const noexcept;
+  virtual void live_result(std::vector<double>& result) const noexcept = 0;
 
   /**
    * Performs a live read for every group without stopping the counter and writes it into the result input/output.
@@ -177,7 +174,7 @@ public:
    * @param result Output parameter to write the result without allocating any memory.
    * @param normalization  Normalization value.
    */
-  void live_result(std::vector<double>& result, std::uint64_t normalization) const noexcept;
+  virtual void live_result(std::vector<double>& result, std::uint64_t normalization) const noexcept = 0;
 
   /**
    * Performs a live read for every group without stopping the counter.
@@ -185,7 +182,7 @@ public:
    * @param counter_index Index of the counter to be read live.
    * @return The live value of the counter.
    */
-  [[nodiscard]] std::optional<double> live_result(std::uint64_t counter_index) const noexcept;
+  [[nodiscard]] virtual std::optional<double> live_result(std::uint64_t counter_index) const noexcept = 0;
 
   /**
    * Performs a live read for every group without stopping the counter.
@@ -194,132 +191,25 @@ public:
    * @param normalization Normalization value.
    * @return The live value of the counter.
    */
-  [[nodiscard]] std::optional<double> live_result(std::uint64_t counter_index,
-                                                  std::uint64_t normalization) const noexcept;
+  [[nodiscard]] virtual std::optional<double> live_result(std::uint64_t counter_index,
+                                                  std::uint64_t normalization) const noexcept = 0;
 
   /**
    * @return A list of event names that are added as live evens.
    */
-  [[nodiscard]] std::vector<std::string_view> live_event_names() const;
+  [[nodiscard]] virtual std::vector<std::string_view> live_event_names() const = 0;
 
   /**
    * @return Configuration of the counter.
    */
-  [[nodiscard]] const Config& config() const noexcept { return _config; }
+  [[nodiscard]] virtual const Config& config() const noexcept = 0;
 
   /**
    * Update the configuration of the counter.
    *
    * @param config New config.
    */
-  void config(const Config config) noexcept { _config = config; }
-
-private:
-  /// List of event names and codes.
-  const CounterDefinition& _counter_definitions;
-
-  /// The configuration of counters (include user, kernel, etc.).
-  Config _config;
-
-  /// List of requested events and metrics that are added to groups. This list is only to track the order and
-  /// configuration of the user's requested events.
-  RequestedEventSet _requested_event_set;
-
-  /// List of requested live events. This list is only to track the order and
-  /// configuration of the user's request.
-  RequestedEventSet _requested_live_event_set;
-
-  /// Hardware counter groups holding performance counters that are started, stopped, and read. The bool indicates if
-  /// that group is "open", meaning no counter can or should be added (false), because the group is full or the user
-  /// wanted to schedule the counters together without any other.
-  std::vector<std::pair<Group, bool>> _hardware_event_groups;
-
-  /// List of counters that are marked to be read "live" (without stopping) using the "rdpmc" instruction (only
-  /// implemented on x86 hardware).
-  std::vector<Counter> _hardware_live_counters;
-
-  /// Start and stop time points for time events.
-  std::pair<std::chrono::steady_clock::time_point, std::chrono::steady_clock::time_point> _start_and_end_time;
-
-  /// Flag indicating if the EventCounter was opened. Opens automatically on startup at the latest.
-  bool _is_opened{ false };
-
-  EventCounter(const CounterDefinition& counter_definition,
-               const Config config,
-               RequestedEventSet requested_event_set,
-               RequestedEventSet requested_live_event_set)
-    : _counter_definitions(counter_definition)
-    , _config(config)
-    , _requested_event_set(std::move(requested_event_set))
-    , _requested_live_event_set(std::move(requested_live_event_set))
-  {
-  }
-
-  /**
-   * @return The number of opened (or to open) counters (groups or group leaders and live counters).
-   */
-  [[nodiscard]] std::size_t size() const noexcept
-  {
-    return _hardware_event_groups.size() + _hardware_live_counters.size();
-  }
-
-  /**
-   * Extracts information (counter/metric name, hardware counter configuration, flag if is included into events) from
-   * the given event into a given result vector. The result vector can be used to schedule the events, based on the user
-   * request.
-   *
-   * @param name Name of the event to add.
-   * @param is_visible_in_results Indicates if the added event/metric/time should be visible in the results.
-   * @param events List to extend the requested events. If the event is a single hardware event, the list will
-   * have one entry. If the event is a metric, the list will have multiple entries.
-   */
-  void unfold(const std::string& name,
-              bool is_visible_in_results,
-              std::vector<std::pair<RequestedEvent, std::optional<CounterConfig>>>& events) const;
-
-  /**
-   * Adds the provided event to the given result vector.
-   * If the event is already in the result vector, only the visibility (is_shown_in_results) will be adjusted.
-   *
-   * @param pmu_name Name of the PMU.
-   * @param event_name Name of the event.
-   * @param event_config Configuration of the counter.
-   * @param is_shown_in_results Visibility.
-   * @param requested_events List of requested events.
-   */
-  static void add(std::string_view pmu_name,
-                  std::string_view event_name,
-                  const CounterConfig& event_config,
-                  bool is_shown_in_results,
-                  std::vector<std::pair<RequestedEvent, std::optional<CounterConfig>>>& requested_events);
-
-  /**
-   * Schedules the given events based on the request into hardware groups and places the event names in the
-   * user-requested event set. If the events do not fit (e.g., based on the request; too many counters requested to be
-   * placed on the same hardware counter), the method will throw an exception to let the user know.
-   *
-   * @param events List of events to schedule.
-   * @param schedule Request of the user.
-   */
-  void schedule(std::vector<std::pair<RequestedEvent, std::optional<CounterConfig>>>&& events, Schedule schedule);
-
-  /**
-   * Try to append the given event to any hardware counter.
-   *
-   * @param event Event to append.
-   * @param event_config Configuration of the event.
-   * @return True, if the event could be appended to any hardware counter. False, otherwise.
-   */
-  [[nodiscard]] bool append_to_any_hardware_counter(RequestedEvent& event, const CounterConfig& event_config);
-
-  /**
-   * Tries to create a new group and appends the given event.
-   *
-   * @param event Event to append.
-   * @param event_config Configuration of the event.
-   * @param is_keep_open If true, further events can be added in the future. Otherwise, the event will be the only one.
-   */
-  void create_new_group(RequestedEvent& event, const CounterConfig& event_config, bool is_keep_open);
+  virtual void config(const Config config) noexcept = 0;
 };
 
 /**

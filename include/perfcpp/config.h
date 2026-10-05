@@ -1,12 +1,9 @@
 #pragma once
 
-#include "branch.h"
 #include "period.h"
 #include "precision.h"
 #include "registers.h"
 #include <cstdint>
-#include <optional>
-#include <sched.h>
 
 namespace perf {
 /**

@@ -1,18 +1,24 @@
-#include "perfcpp/record_file_writer.h"
 
 #include <algorithm>
+#include <cstdint>
+#include <cstdlib>
 #include <cstring>
 #include <cxxabi.h>
+#include <elf.h>
 #include <fcntl.h>
 #include <fstream>
+#include <iterator>
 #include <memory>
+#include <optional>
 #include <perfcpp/exception.h>
 #include <perfcpp/symbol_resolver.h>
 #include <perfcpp/util/unique_file_descriptor.h>
 #include <regex>
+#include <string>
 #include <sys/mman.h>
 #include <sys/stat.h>
-#include <unistd.h>
+#include <utility>
+#include <vector>
 
 perf::SymbolResolver::SymbolResolver()
 {
